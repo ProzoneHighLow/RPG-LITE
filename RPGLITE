@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mini RPG Battle</title>
+  <style>
+    body { font-family: monospace; background: #111; color: #0f0; padding: 20px; }
+    button { margin: 10px 0; font-size: 18px; }
+  </style>
+</head>
+<body>
+
+  <h2>🗡️ Mini RPG Battle</h2>
+  <pre id="log"></pre>
+  <button onclick="takeTurn()">▶️ Attack</button>
+
+  <script>
+    const player = {
+      name: "Hero",
+      strength: 10,
+      defense: 5,
+      agility: 8,
+      luck: 5,
+      grit: 5,
+      hp: 100
+    };
+
+    const enemy = {
+      name: "Goblin",
+      strength: 8,
+      defense: 4,
+      agility: 6,
+      luck: 3,
+      grit: 2,
+      hp: 80
+    };
+
+    const log = document.getElementById("log");
+
+    function rollRing() {
+      return Math.floor(Math.random() * 6) + 1;
+    }
+
+    function attack(attacker, defender) {
+      const ring = rollRing();
+      const base = attacker.strength * (attacker.luck ** 2 * ring) / Math.max(1, defender.defense);
+
+      let whiffChance = Math.min(0.5, attacker.luck * 0.02) - attacker.grit * 0.015;
+      whiffChance = Math.max(0, whiffChance);
+
+      if (Math.random() < whiffChance) {
+        log.textContent += `${attacker.name} WHIFFED!\n`;
+        return;
+      }
+
+      const dmg = Math.floor(base);
+      defender.hp -= dmg;
+      log.textContent += `${attacker.name} hits ${defender.name} for ${dmg} damage!\n`;
+    }
+
+    function takeTurn() {
+      if (player.hp <= 0 || enemy.hp <= 0) return;
+
+      attack(player, enemy);
+      if (enemy.hp > 0) {
+        attack(enemy, player);
+      }
+
+      log.textContent += `\nHP: ${player.name}: ${player.hp} | ${enemy.name}: ${enemy.hp}\n`;
+
+      if (player.hp <= 0) {
+        log.textContent += "\n💀 You lose!";
+      } else if (enemy.hp <= 0) {
+        log.textContent += "\n🎉 You win!";
+      }
+    }
+  </script>
+
+</body>
+</html>
